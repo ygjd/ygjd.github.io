@@ -354,25 +354,85 @@
         .plane.fly .wind { opacity: 1; animation: windMove 0.6s linear infinite; }
         @keyframes windMove { from { background-position: 0 0; } to { background-position: -120px 0; } }
 
+        /* Rocket‑flame styled clickable text */
         .flame-text {
             position: fixed;
             left: 50%; top: 50%;
-            transform: translate(-50%,-50%) scale(0.92);
-            font-size: 32px; font-weight: 800; letter-spacing: 0.04em;
-            color: #ffd6d6; text-decoration: none;
-            opacity: 0; pointer-events: none;
+            transform: translate(-50%,-50%) scale(0.96);
+            font-size: 34px;
+            font-weight: 900;
+            letter-spacing: 0.06em;
+            text-decoration: none;
+            opacity: 0;
+            pointer-events: none;
             z-index: 860;
-            text-shadow:
-                0 0 6px #ff2a00,
-                0 0 16px #ff6a00,
-                0 0 30px #ff0000,
-                0 0 60px rgba(255,0,0,0.6);
+
+            color: transparent;
+            background: linear-gradient(180deg,
+                #fffde1 0%,
+                #ffe46a 18%,
+                #ffb026 40%,
+                #ff5d00 62%,
+                #d20a00 80%,
+                rgba(210,10,0,0.0) 100%);
+            -webkit-background-clip: text;
+            background-clip: text;
+
+            filter: drop-shadow(0 0 12px rgba(255, 120, 0, 0.65))
+                    drop-shadow(0 0 28px rgba(255, 60, 0, 0.6));
+
+            -webkit-mask-image: radial-gradient(140% 220% at 50% 130%, #000 38%, transparent 68%);
+            mask-image: radial-gradient(140% 220% at 50% 130%, #000 38%, transparent 68%);
         }
         .flame-text.show {
-            opacity: 1; pointer-events: auto;
-            animation: flameAppear 350ms ease-out both, flameFlicker 120ms 350ms infinite;
+            opacity: 1;
+            pointer-events: auto;
+            animation:
+                flameAppear 280ms ease-out both,
+                flameFlicker 110ms 280ms infinite,
+                heatShimmer 800ms 280ms linear infinite;
         }
-        .flame-text.burnout { animation: flameFade 900ms ease forwards; pointer-events: none; }
+        .flame-text.burnout {
+            animation: flameFade 850ms ease forwards, plumeCollapse 850ms ease forwards;
+            pointer-events: none;
+        }
+        .flame-text::before {
+            content: "";
+            position: absolute;
+            inset: -20px -36px -28px -36px;
+            transform: skewY(-4deg);
+            background: radial-gradient(ellipse at 50% 48%,
+                rgba(255,255,240,0.95) 0%,
+                rgba(255,220,120,0.9) 22%,
+                rgba(255,150,20,0.65) 46%,
+                rgba(255,60,0,0.35) 64%,
+                rgba(255,20,0,0.0) 78%);
+            filter: blur(10px);
+            mix-blend-mode: screen;
+            opacity: 0;
+            pointer-events: none;
+        }
+        .flame-text.show::before { opacity: 1; animation: jetPulse 120ms ease-in-out infinite; }
+        .flame-text::after {
+            content: "";
+            position: absolute;
+            left: 50%; top: 50%;
+            width: 340px; height: 140px;
+            transform: translate(-50%,-45%) skewX(-10deg);
+            background:
+                radial-gradient(circle at 30% 60%, rgba(255,200,80,0.9) 0 2px, transparent 3px),
+                radial-gradient(circle at 55% 40%, rgba(255,150,50,0.8) 0 2px, transparent 3px),
+                radial-gradient(circle at 72% 65%, rgba(255,110,30,0.7) 0 2px, transparent 3px),
+                radial-gradient(circle at 44% 75%, rgba(255,220,160,0.8) 0 1.5px, transparent 2px),
+                radial-gradient(circle at 68% 52%, rgba(255,90,0,0.7) 0 1.5px, transparent 2px);
+            filter: blur(0.6px);
+            opacity: 0;
+            pointer-events: none;
+            mask-image: linear-gradient(90deg, #000 45%, transparent 85%);
+        }
+        .flame-text.show::after { opacity: 0.85; animation: embers 700ms linear infinite; }
+
+        /* Existing keyframes kept + new ones */
         @keyframes flameAppear {
             0% { opacity: 0; filter: blur(8px); transform: translate(-50%,-50%) scale(0.88); }
             100% { opacity: 1; filter: blur(0); transform: translate(-50%,-50%) scale(1); }
@@ -382,6 +442,21 @@
             50%     { text-shadow: 0 0 8px #ff6a00, 0 0 22px #ffa000, 0 0 40px #ff1a00, 0 0 80px rgba(255,40,0,0.8); }
         }
         @keyframes flameFade { to { opacity: 0; filter: blur(6px); } }
+        @keyframes heatShimmer {
+            0%   { filter: drop-shadow(0 0 10px rgba(255, 120, 0, 0.6)) drop-shadow(0 0 26px rgba(255, 60, 0, 0.55)); transform: translate(-50%,-50%) scale(1); }
+            50%  { filter: drop-shadow(0 0 14px rgba(255, 150, 0, 0.7)) drop-shadow(0 0 34px rgba(255, 90, 0, 0.65)); transform: translate(-50%,-50%) scale(1.015); }
+            100% { filter: drop-shadow(0 0 10px rgba(255, 120, 0, 0.6)) drop-shadow(0 0 26px rgba(255, 60, 0, 0.55)); transform: translate(-50%,-50%) scale(1); }
+        }
+        @keyframes jetPulse {
+            0%   { transform: skewY(-4deg) scaleX(0.92); filter: blur(9px); }
+            50%  { transform: skewY(-4deg) scaleX(1.05); filter: blur(12px); }
+            100% { transform: skewY(-4deg) scaleX(0.92); filter: blur(9px); }
+        }
+        @keyframes embers {
+            0%   { transform: translate(-50%,-45%) skewX(-10deg) scaleX(1); opacity: 0.9; }
+            100% { transform: translate(-38%,-47%) skewX(-12deg) scaleX(1.18); opacity: 0.2; }
+        }
+        @keyframes plumeCollapse { to { transform: translate(-50%,-50%) scale(0.9); filter: blur(6px); } }
 
         /* Responsive */
         @media (max-width: 768px) {
@@ -470,7 +545,6 @@
         let matrixAnimationId = null;
         let matrixRunning = false;
 
-        // Create typing animation
         function showMessage() {
             if (messageIndex < messages.length) {
                 const bubble = document.createElement('div');
@@ -486,7 +560,6 @@
             }
         }
 
-        // Transition: hide typing -> show matrix -> reveal space
         function transitionToSpace() {
             typingContainer.style.opacity = '0';
             setTimeout(() => {
@@ -495,7 +568,6 @@
             }, 1000);
         }
 
-        // Activate space scene
         function proceedToSpace() {
             spaceScene.classList.add('active');
             createStars();
@@ -514,11 +586,9 @@
 
             setInterval(createShootingStar, 10000);
 
-            // start plane schedule
             schedulePlane();
         }
 
-        // Start Matrix overlay
         function startMatrix(durationMs = 2500) {
             matrixOverlay.style.display = 'block';
             void matrixOverlay.offsetWidth;
@@ -537,7 +607,6 @@
             }, durationMs);
         }
 
-        // Matrix animation loop
         function runMatrix() {
             const ctx = matrixCanvas.getContext('2d');
             const fontSize = 16;
@@ -590,7 +659,6 @@
             draw();
         }
 
-        // Create stars for space scene
         function createStars() {
             for (let i = 0; i < 150; i++) {
                 const star = document.createElement('div');
@@ -606,7 +674,6 @@
             }
         }
 
-        // Create floating particles
         function createParticles() {
             for (let i = 0; i < 40; i++) {
                 const particle = document.createElement('div');
@@ -619,7 +686,6 @@
             }
         }
 
-        // Create a shooting star rendered as a small spec
         function createShootingStar() {
             const shootingStar = document.createElement('div');
             shootingStar.className = 'shooting-star';
@@ -637,7 +703,6 @@
             setTimeout(() => { shootingStar.remove(); }, duration * 1000);
         }
 
-        // Download resume function
         function downloadResume() {
             const link = document.createElement('a');
             link.href = 'Resume.pdf';
@@ -681,10 +746,8 @@
             setInterval(planePass, 180000);
         }
 
-        // Start the animation sequence
         setTimeout(showMessage, 500);
 
-        // Add parallax effect on mouse movement
         document.addEventListener('mousemove', (e) => {
             if (spaceScene.classList.contains('active')) {
                 const x = (e.clientX / window.innerWidth - 0.5) * 2;
