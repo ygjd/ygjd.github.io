@@ -217,20 +217,20 @@
             }
         }
 
- .link-column {
-    position: fixed;
-    bottom: 20px;
-    left: 50%;
-    transform: translateX(-50%);
-    width: calc(100% - 40px);
-    display: flex;
-    flex-direction: row;
-    flex-wrap: wrap;
-    justify-content: center;
-    align-items: flex-end;
-    gap: 12px;
-    z-index: 700;
-}
+        .link-column {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: calc(100% - 40px);
+            display: flex;
+            flex-direction: row;
+            flex-wrap: wrap;
+            justify-content: center;
+            align-items: flex-end;
+            gap: 12px;
+            z-index: 700;
+        }
 
         /* Resume Droplet in Space */
         .space-droplet {
@@ -302,6 +302,87 @@
             letter-spacing: 0.1rem;
         }
 
+        /* Plane + effects */
+        .plane {
+            position: fixed;
+            top: 50%;
+            left: -220px;
+            transform: translateY(-50%);
+            width: 180px;
+            height: 120px;
+            z-index: 850;
+            pointer-events: none;
+            filter: drop-shadow(0 8px 24px rgba(0,0,0,0.6));
+        }
+        .plane img { width: 100%; height: auto; display: block; }
+        .plane.fly { animation: flyAcross 6s linear both, planeWobble 2.2s ease-in-out infinite; }
+        @keyframes flyAcross { 0% { left: -220px; } 100% { left: calc(100vw + 220px); } }
+        @keyframes planeWobble { 0%,100% { transform: translateY(-50%) rotateZ(-1deg); } 50% { transform: translateY(-50%) rotateZ(1deg); } }
+
+        .plane .afterburner {
+            position: absolute;
+            right: 150px; top: 50%;
+            transform: translateY(-50%) scaleX(0.6);
+            width: 220px; height: 100px;
+            opacity: 0; pointer-events: none;
+            background: conic-gradient(from 180deg at 15% 50%, rgba(255,245,180,1), rgba(255,160,0,0.95) 35%, rgba(255,40,0,0.8) 60%, rgba(255,0,0,0) 85%);
+            filter: blur(8px) contrast(1.1) saturate(1.3);
+            border-radius: 60% 0 0 60% / 50%;
+            mix-blend-mode: screen;
+        }
+        .plane.afterburn .afterburner { opacity: 1; animation: flamePulse 120ms infinite; }
+        @keyframes flamePulse {
+            0% { transform: translateY(-50%) scaleX(0.55); filter: blur(7px); }
+            50% { transform: translateY(-50%) scaleX(0.75); filter: blur(10px); }
+            100% { transform: translateY(-50%) scaleX(0.55); filter: blur(7px); }
+        }
+
+        .plane .wind {
+            position: absolute;
+            right: 180px; top: 50%;
+            transform: translateY(-50%) skewX(-18deg);
+            width: 360px; height: 120px;
+            opacity: 0; pointer-events: none;
+            background: repeating-linear-gradient(90deg,
+                rgba(255,255,255,0.14) 0 2px,
+                rgba(255,255,255,0.04) 2px 10px,
+                transparent 10px 20px);
+            filter: blur(6px);
+            -webkit-mask-image: radial-gradient(120% 80% at 100% 50%, #000 0%, transparent 70%);
+            mask-image: radial-gradient(120% 80% at 100% 50%, #000 0%, transparent 70%);
+        }
+        .plane.fly .wind { opacity: 1; animation: windMove 0.6s linear infinite; }
+        @keyframes windMove { from { background-position: 0 0; } to { background-position: -120px 0; } }
+
+        .flame-text {
+            position: fixed;
+            left: 50%; top: 50%;
+            transform: translate(-50%,-50%) scale(0.92);
+            font-size: 32px; font-weight: 800; letter-spacing: 0.04em;
+            color: #ffd6d6; text-decoration: none;
+            opacity: 0; pointer-events: none;
+            z-index: 860;
+            text-shadow:
+                0 0 6px #ff2a00,
+                0 0 16px #ff6a00,
+                0 0 30px #ff0000,
+                0 0 60px rgba(255,0,0,0.6);
+        }
+        .flame-text.show {
+            opacity: 1; pointer-events: auto;
+            animation: flameAppear 350ms ease-out both, flameFlicker 120ms 350ms infinite;
+        }
+        .flame-text.burnout { animation: flameFade 900ms ease forwards; pointer-events: none; }
+        @keyframes flameAppear {
+            0% { opacity: 0; filter: blur(8px); transform: translate(-50%,-50%) scale(0.88); }
+            100% { opacity: 1; filter: blur(0); transform: translate(-50%,-50%) scale(1); }
+        }
+        @keyframes flameFlicker {
+            0%,100% { text-shadow: 0 0 6px #ff2a00, 0 0 16px #ff6a00, 0 0 30px #ff0000, 0 0 60px rgba(255,0,0,0.6); }
+            50%     { text-shadow: 0 0 8px #ff6a00, 0 0 22px #ffa000, 0 0 40px #ff1a00, 0 0 80px rgba(255,40,0,0.8); }
+        }
+        @keyframes flameFade { to { opacity: 0; filter: blur(6px); } }
+
         /* Responsive */
         @media (max-width: 768px) {
             .space-link {
@@ -354,18 +435,28 @@
                 📄<br>Resume
             </div>
         </div>
+
+        <!-- Plane fly-by -->
+        <div class="plane" id="plane">
+            <img src="blueangel.png" alt="Plane" />
+            <div class="afterburner"></div>
+            <div class="wind"></div>
+        </div>
+
+        <!-- Fiery clickable text -->
+        <a href="https://LegacyInTheSkies.co" target="_blank" class="flame-text" id="flameTextLink">LegacyInTheSkies.co</a>
     </div>
 
     <script>
         // Typing animation messages
         const messages = [
-  { text: "..", delay: 500 },
-  { text: "I'm Jay Hill 🧿", delay: 1000 },
-  { text: "I design & code", delay: 1000 },
-  { text: "Creator of LegacyInTheSkies.co ✈", delay: 1200 },
-  { text: "Continuously building", delay: 1000 },
-  { text: "Let's create", delay: 1200 }
-];
+            { text: "..", delay: 500 },
+            { text: "I'm Jay Hill 🧿", delay: 1000 },
+            { text: "I design & code", delay: 1000 },
+            { text: "Creator of LegacyInTheSkies.co ✈", delay: 1200 },
+            { text: "Continuously building", delay: 1000 },
+            { text: "Let's create", delay: 1200 }
+        ];
 
         let messageIndex = 0;
         const messagesContainer = document.getElementById('messages');
@@ -391,7 +482,6 @@
                 messageIndex++;
                 setTimeout(showMessage, messages[messageIndex - 1].delay);
             } else {
-                // Start transition to matrix, then space scene
                 setTimeout(transitionToSpace, 2000);
             }
         }
@@ -401,17 +491,16 @@
             typingContainer.style.opacity = '0';
             setTimeout(() => {
                 typingContainer.style.display = 'none';
-                startMatrix(2500); // duration in ms
+                startMatrix(2500);
             }, 1000);
         }
 
-        // Activate space scene (unchanged behavior moved here)
+        // Activate space scene
         function proceedToSpace() {
             spaceScene.classList.add('active');
             createStars();
             createParticles();
             
-            // Show title and links
             setTimeout(() => {
                 spaceTitle.classList.add('visible');
                 const links = document.querySelectorAll('.space-link');
@@ -423,29 +512,28 @@
                 document.querySelector('.space-droplet').classList.add('visible');
             }, 500);
 
-            // Start shooting stars at a slower pace
             setInterval(createShootingStar, 10000);
+
+            // start plane schedule
+            schedulePlane();
         }
 
         // Start Matrix overlay
         function startMatrix(durationMs = 2500) {
-            // Prepare overlay
             matrixOverlay.style.display = 'block';
-            // Force reflow before changing opacity
             void matrixOverlay.offsetWidth;
             matrixOverlay.style.opacity = '1';
 
             matrixRunning = true;
             runMatrix();
 
-            // Stop and fade out after duration
             setTimeout(() => {
                 matrixOverlay.style.opacity = '0';
                 matrixRunning = false;
                 setTimeout(() => {
                     matrixOverlay.style.display = 'none';
                     proceedToSpace();
-                }, 800); // match CSS transition
+                }, 800);
             }, durationMs);
         }
 
@@ -475,7 +563,6 @@
                     return;
                 }
 
-                // Slightly opaque rect for trailing effect
                 ctx.fillStyle = 'rgba(0, 0, 0, 0.08)';
                 ctx.fillRect(0, 0, matrixCanvas.width, matrixCanvas.height);
 
@@ -497,7 +584,6 @@
                 matrixAnimationId = requestAnimationFrame(draw);
             }
 
-            // Prime background
             ctx.fillStyle = 'rgba(0, 0, 0, 1)';
             ctx.fillRect(0, 0, matrixCanvas.width, matrixCanvas.height);
 
@@ -537,8 +623,6 @@
         function createShootingStar() {
             const shootingStar = document.createElement('div');
             shootingStar.className = 'shooting-star';
-            
-            // Random starting position
             const startFromTop = Math.random() > 0.5;
             if (startFromTop) {
                 shootingStar.style.top = Math.random() * 40 + '%';
@@ -547,31 +631,54 @@
                 shootingStar.style.top = Math.random() * 20 - 50 + 'px';
                 shootingStar.style.right = Math.random() * 60 + '%';
             }
-            
-            // Vary animation duration for more natural effect
             const duration = 2 + Math.random() * 2;
             shootingStar.style.animationDuration = duration + 's';
-
             spaceScene.appendChild(shootingStar);
-
-            // Remove after animation completes
-            setTimeout(() => {
-                shootingStar.remove();
-            }, duration * 1000);
+            setTimeout(() => { shootingStar.remove(); }, duration * 1000);
         }
 
         // Download resume function
         function downloadResume() {
             const link = document.createElement('a');
-            link.href = 'Resume.pdf'; // You'll need to add your actual resume file
+            link.href = 'Resume.pdf';
             link.download = 'JayHill_Resume.pdf';
             link.click();
-            
-            // Visual feedback
             event.target.style.transform = 'scale(1.3) rotate(360deg)';
-            setTimeout(() => {
-                event.target.style.transform = '';
-            }, 500);
+            setTimeout(() => { event.target.style.transform = ''; }, 500);
+        }
+
+        // Plane + afterburner + flame text
+        const plane = document.getElementById('plane');
+        const flameTextLink = document.getElementById('flameTextLink');
+
+        function planePass() {
+            if (!plane) return;
+            plane.classList.remove('fly', 'afterburn');
+            plane.style.left = '-220px';
+            flameTextLink.classList.remove('show', 'burnout');
+
+            requestAnimationFrame(() => {
+                const flightMs = 6000;
+                plane.classList.add('fly');
+
+                setTimeout(() => {
+                    plane.classList.add('afterburn');
+                    flameTextLink.classList.add('show');
+                    setTimeout(() => {
+                        flameTextLink.classList.remove('show');
+                        flameTextLink.classList.add('burnout');
+                    }, 2200);
+                }, Math.floor(flightMs * 0.48));
+
+                plane.addEventListener('animationend', () => {
+                    plane.classList.remove('fly', 'afterburn');
+                }, { once: true });
+            });
+        }
+
+        function schedulePlane() {
+            setTimeout(planePass, 3500);
+            setInterval(planePass, 180000);
         }
 
         // Start the animation sequence
@@ -582,7 +689,6 @@
             if (spaceScene.classList.contains('active')) {
                 const x = (e.clientX / window.innerWidth - 0.5) * 2;
                 const y = (e.clientY / window.innerHeight - 0.5) * 2;
-                
                 const stars = document.querySelectorAll('.star');
                 stars.forEach((star, index) => {
                     const speed = (index % 3 + 1) * 0.5;
