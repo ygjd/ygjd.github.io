@@ -218,16 +218,18 @@
         }
 
         .link-column {
-            position: fixed;
-            bottom: 20px;
-            left: 50%;
-            transform: translateX(-50%);
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 10px;
-            z-index: 700;
-        }
+    position: fixed;
+    left: 50%;
+    transform: translateX(-50%);
+    top: 0;           /* stretch the container vertically */
+    bottom: 20px;     /* 20px inset from bottom */
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;  /* push links to bottom */
+    align-items: center;
+    gap: 10px;
+    z-index: 700;
+}
 
         /* Resume Droplet in Space */
         .space-droplet {
