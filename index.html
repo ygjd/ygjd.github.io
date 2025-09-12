@@ -124,52 +124,16 @@
         }
 
         /* Shooting Stars */
-        /* Shooting Stars - Improved */
+        /* Render shooting stars as small specs without long tails */
 .shooting-star {
     position: absolute;
-    width: 4px;
-    height: 4px;
+    width: 3px;
+    height: 3px;
     background: white;
     border-radius: 50%;
     filter: drop-shadow(0 0 6px rgba(255, 255, 255, 1));
     animation: shoot 2s linear infinite;
     opacity: 0;
-}
-
-.shooting-star::before {
-    content: '';
-    position: absolute;
-    top: 50%;
-    transform: translateY(-50%);
-    width: 300px;
-    height: 2px;
-    background: linear-gradient(90deg, 
-        transparent,
-        rgba(255, 255, 255, 0.1) 10%,
-        rgba(255, 255, 255, 0.4) 20%,
-        rgba(255, 255, 255, 0.6) 30%,
-        rgba(255, 255, 255, 0.8) 50%,
-        white 100%
-    );
-    right: -2px;
-    transform-origin: right center;
-}
-
-.shooting-star::after {
-    content: '';
-    position: absolute;
-    top: 50%;
-    transform: translateY(-50%);
-    width: 150px;
-    height: 1px;
-    background: linear-gradient(90deg,
-        transparent,
-        rgba(100, 150, 255, 0.2) 20%,
-        rgba(100, 150, 255, 0.5) 60%,
-        rgba(150, 200, 255, 0.8) 100%
-    );
-    right: -2px;
-    filter: blur(2px);
 }
 
 @keyframes shoot {
@@ -189,87 +153,29 @@
     }
 }
 
-/* Alternative shooting star style - more comet-like */
-.shooting-star-alt {
-    position: absolute;
-    width: 0;
-    height: 0;
-    opacity: 0;
-    animation: shootAlt 3s linear infinite;
-}
-
-.shooting-star-alt::before {
-    content: '';
-    position: absolute;
-    width: 5px;
-    height: 5px;
-    background: radial-gradient(circle, white 0%, rgba(255, 255, 255, 0.8) 40%, transparent 100%);
-    border-radius: 50%;
-    box-shadow: 
-        0 0 10px rgba(255, 255, 255, 1),
-        0 0 20px rgba(100, 150, 255, 0.8),
-        0 0 30px rgba(100, 150, 255, 0.6);
-}
-
-.shooting-star-alt::after {
-    content: '';
-    position: absolute;
-    top: 2px;
-    left: 4px;
-    width: 100px;
-    height: 1px;
-    background: linear-gradient(90deg,
-        white,
-        rgba(255, 255, 255, 0.8) 10%,
-        rgba(100, 150, 255, 0.5) 40%,
-        rgba(100, 150, 255, 0.2) 60%,
-        transparent 100%
-    );
-    transform: rotate(45deg);
-    transform-origin: left center;
-    filter: blur(1px);
-}
-
-@keyframes shootAlt {
-    0% {
-        opacity: 0;
-        transform: translateX(200px) translateY(-200px) scale(0);
-    }
-    10% {
-        opacity: 1;
-        transform: translateX(150px) translateY(-150px) scale(1);
-    }
-    90% {
-        opacity: 1;
-        transform: translateX(-900px) translateY(500px) scale(1);
-    }
-    100% {
-        opacity: 0;
-        transform: translateX(-950px) translateY(550px) scale(0);
-    }
-}
 
         /* Floating Links in Space */
         .space-link {
-            position: absolute;
+            display: block;
             padding: 12px 24px;
             background: rgba(255, 255, 255, 0.08);
             backdrop-filter: blur(20px);
             border-radius: 30px;
             color: white;
             text-decoration: none;
-            transition: all 0.4s ease;
+            transition: background 0.4s ease, transform 0.4s ease;
             border: 1px solid rgba(255, 255, 255, 0.2);
             font-size: 14px;
-            animation: gentleOrbit 30s infinite ease-in-out;
             box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
             opacity: 0;
+            transform: translateY(100vh);
+            pointer-events: none;
             z-index: 600;
         }
 
         .space-link.visible {
-            opacity: 1;
-            transition: opacity 1s ease-in-out;
+            animation: dropIn 1s ease-out forwards;
+            pointer-events: auto;
         }
 
         .space-link:hover {
@@ -279,33 +185,47 @@
             border-color: rgba(255, 255, 255, 0.4);
         }
 
-        @keyframes gentleOrbit {
-            0%, 100% { 
-                transform: translateY(0) translateX(0); 
+        @keyframes dropIn {
+            0% {
+                transform: translateY(100vh) scale(0.8);
+                opacity: 0;
             }
-            25% { 
-                transform: translateY(-20px) translateX(15px); 
+            60% {
+                transform: translateY(-15px) scale(1.05);
+                opacity: 1;
             }
-            50% { 
-                transform: translateY(15px) translateX(-20px); 
+            80% {
+                transform: translateY(8px) scale(0.97);
             }
-            75% { 
-                transform: translateY(-15px) translateX(20px); 
+            100% {
+                transform: translateY(0) scale(1);
+                opacity: 1;
             }
         }
 
+        .link-column {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 10px;
+            z-index: 700;
+        }
+
+
         /* Resume Droplet in Space */
         .space-droplet {
-            position: absolute;
             width: 70px;
             height: 70px;
-            background: radial-gradient(circle at 30% 30%, 
-                rgba(100, 150, 255, 0.8) 0%, 
-                rgba(50, 100, 200, 0.6) 40%, 
+            background: radial-gradient(circle at 30% 30%,
+                rgba(100, 150, 255, 0.8) 0%,
+                rgba(50, 100, 200, 0.6) 40%,
                 rgba(20, 50, 150, 0.4) 100%);
             border-radius: 50%;
             cursor: pointer;
-            animation: pulseFloat 6s infinite ease-in-out;
             box-shadow: 0 0 30px rgba(100, 150, 255, 0.5),
                         inset -5px -5px 15px rgba(255, 255, 255, 0.2);
             display: flex;
@@ -319,6 +239,7 @@
             border: 1px solid rgba(255, 255, 255, 0.3);
             z-index: 600;
             opacity: 0;
+            margin-top: 10px;
         }
 
         .space-droplet.visible {
@@ -332,20 +253,6 @@
                         inset -5px -5px 15px rgba(255, 255, 255, 0.4);
         }
 
-        @keyframes pulseFloat {
-            0%, 100% { 
-                transform: translateY(0) scale(1); 
-            }
-            25% { 
-                transform: translateY(-15px) scale(1.05); 
-            }
-            50% { 
-                transform: translateY(10px) scale(0.95); 
-            }
-            75% { 
-                transform: translateY(-10px) scale(1.02); 
-            }
-        }
 
         /* Center title in space */
         .space-title {
@@ -414,18 +321,18 @@
         </div>
 
         <!-- Floating Links -->
-        <a href="https://github.com/jayhill365" class="space-link" target="_blank" style="top: 30%; left: 10%; animation-delay: 0s;">OLDGitHub</a>
-        <a href="https://twitter.com/_jayhill" class="space-link" target="_blank" style="top: 50%; right: 12%; animation-delay: 0.5s;">X</a>
-        <a href="https://linkedin.com/in/ja-hill" class="space-link" target="_blank" style="top: 70%; left: 15%; animation-delay: 1s;">LinkedIn</a>
-        <a href="https://LegacyInTheSkies.co" class="space-link" target="_blank" style="top: 35%; left: 45%; animation-delay: 1.5s;">LegacyInTheSkies ✈️</a>
-        <a href="https://www.instagram.com/1jayhill/" class="space-link" target="_blank" style="top: 60%; right: 30%; animation-delay: 2s;">Instagram</a>
-        <a href="https://www.instagram.com/jayhillproduction/" class="space-link" target="_blank" style="top: 45%; right: 8%; animation-delay: 2.5s;">Photography</a>
-        <a href="https://1jayhill.medium.com" class="space-link" target="_blank" style="top: 75%; left: 40%; animation-delay: 3s;">Medium</a>
-        <a href="mailto:jay@legacyintheskies.co" class="space-link" style="top: 25%; right: 25%; animation-delay: 3.5s;">Email 📧</a>
-
-        <!-- Resume Droplet -->
-        <div class="space-droplet" style="top: 50%; left: 70%;" onclick="downloadResume()">
-            📄<br>Resume
+        <div class="link-column">
+            <a href="https://github.com/jayhill365" class="space-link" target="_blank">OLDGitHub</a>
+            <a href="https://twitter.com/_jayhill" class="space-link" target="_blank">X</a>
+            <a href="https://linkedin.com/in/ja-hill" class="space-link" target="_blank">LinkedIn</a>
+            <a href="https://LegacyInTheSkies.co" class="space-link" target="_blank">LegacyInTheSkies ✈️</a>
+            <a href="https://www.instagram.com/1jayhill/" class="space-link" target="_blank">Instagram</a>
+            <a href="https://www.instagram.com/jayhillproduction/" class="space-link" target="_blank">Photography</a>
+            <a href="https://1jayhill.medium.com" class="space-link" target="_blank">Medium</a>
+            <a href="mailto:jay@legacyintheskies.co" class="space-link">Email 📧</a>
+            <div class="space-droplet" onclick="downloadResume()">
+                📄<br>Resume
+            </div>
         </div>
     </div>
 
@@ -484,10 +391,10 @@
                     document.querySelector('.space-droplet').classList.add('visible');
                 }, 500);
 
-                // Start shooting stars
-                setInterval(createShootingStar, 4000);
-            }, 1000);
-        }
+                  // Start shooting stars at a slower pace
+                  setInterval(createShootingStar, 10000);
+              }, 1000);
+          }
 
         // Create stars for space scene
         function createStars() {
@@ -518,13 +425,10 @@
             }
         }
 
-       // Updated createShootingStar function with alternating styles
+       // Create a shooting star rendered as a small spec
 function createShootingStar() {
     const shootingStar = document.createElement('div');
-    
-    // Randomly choose between two shooting star styles
-    const useAltStyle = Math.random() > 0.5;
-    shootingStar.className = useAltStyle ? 'shooting-star-alt' : 'shooting-star';
+    shootingStar.className = 'shooting-star';
     
     // Random starting position
     const startFromTop = Math.random() > 0.5;
@@ -539,23 +443,20 @@ function createShootingStar() {
     // Vary animation duration for more natural effect
     const duration = 2 + Math.random() * 2;
     shootingStar.style.animationDuration = duration + 's';
-    
+
     spaceScene.appendChild(shootingStar);
-    
+
     // Remove after animation completes
     setTimeout(() => {
         shootingStar.remove();
     }, duration * 1000);
 }
 
-// You can also adjust the interval for more or fewer shooting stars
-setInterval(createShootingStar, 3000 + Math.random() * 2000);
-
-        // Download resume function
-        function downloadResume() {
+          // Download resume function
+          function downloadResume() {
             // Create a temporary link element
             const link = document.createElement('a');
-            link.href = 'resume.pdf'; // You'll need to add your actual resume file
+              link.href = 'Resume.pdf'; // You'll need to add your actual resume file
             link.download = 'JayHill_Resume.pdf';
             link.click();
             
