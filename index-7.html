@@ -1,0 +1,491 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Jay Hill - Portfolio</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: rgb(6, 44, 94);
+            color: white;
+            overflow: hidden;
+            height: 100vh;
+            position: relative;
+        }
+
+        /* Typing Animation Container */
+        .typing-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: flex-start;
+            padding: 2rem;
+            z-index: 1000;
+            background: rgb(6, 44, 94);
+            transition: opacity 1s ease-out;
+        }
+
+        .messages {
+            max-width: 600px;
+        }
+
+        .bubble {
+            display: inline-block;
+            padding: 0.75rem 1.25rem;
+            margin: 0.5rem 0;
+            background: rgba(206, 206, 206, 0.5);
+            border-radius: 1.25rem;
+            animation: slideIn 0.5s ease-out;
+            opacity: 0;
+            animation-fill-mode: forwards;
+            backdrop-filter: blur(10px);
+        }
+
+        .bubble a {
+            color: #0076FF;
+            text-decoration: none;
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateX(-20px);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        /* Space Scene */
+        .space-scene {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(ellipse at center, #0a0a2e 0%, #000000 100%);
+            opacity: 0;
+            transition: opacity 2s ease-in-out;
+            z-index: 500;
+        }
+
+        .space-scene.active {
+            opacity: 1;
+        }
+
+        .star {
+            position: absolute;
+            background: white;
+            border-radius: 50%;
+            animation: twinkle 3s infinite;
+        }
+
+        @keyframes twinkle {
+            0%, 100% { 
+                opacity: 0.2; 
+                transform: scale(1); 
+            }
+            50% { 
+                opacity: 1; 
+                transform: scale(1.2); 
+                filter: blur(0.5px);
+            }
+        }
+
+        .particle {
+            position: absolute;
+            width: 2px;
+            height: 2px;
+            background: white;
+            border-radius: 50%;
+            opacity: 0.6;
+            animation: float 25s infinite linear;
+        }
+
+        @keyframes float {
+            from {
+                transform: translateY(100vh) translateX(0);
+            }
+            to {
+                transform: translateY(-100px) translateX(50px);
+            }
+        }
+
+        /* Shooting Stars */
+        .shooting-star {
+            position: absolute;
+            width: 3px;
+            height: 3px;
+            background: white;
+            border-radius: 50%;
+            box-shadow: 0 0 10px 2px rgba(255, 255, 255, 0.8);
+            animation: shoot 3s linear infinite;
+            opacity: 0;
+        }
+
+        .shooting-star::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 300px;
+            height: 1px;
+            background: linear-gradient(90deg, white, transparent);
+            right: 3px;
+        }
+
+        @keyframes shoot {
+            0% {
+                opacity: 0;
+                transform: translateX(0) translateY(0) rotate(-45deg);
+            }
+            10% {
+                opacity: 1;
+            }
+            90% {
+                opacity: 1;
+            }
+            100% {
+                opacity: 0;
+                transform: translateX(-1500px) translateY(600px) rotate(-45deg);
+            }
+        }
+
+        /* Floating Links in Space */
+        .space-link {
+            position: absolute;
+            padding: 12px 24px;
+            background: rgba(255, 255, 255, 0.08);
+            backdrop-filter: blur(20px);
+            border-radius: 30px;
+            color: white;
+            text-decoration: none;
+            transition: all 0.4s ease;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            font-size: 14px;
+            animation: gentleOrbit 30s infinite ease-in-out;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            opacity: 0;
+            z-index: 600;
+        }
+
+        .space-link.visible {
+            opacity: 1;
+            transition: opacity 1s ease-in-out;
+        }
+
+        .space-link:hover {
+            background: rgba(255, 255, 255, 0.15);
+            transform: scale(1.1);
+            box-shadow: 0 12px 40px rgba(255, 255, 255, 0.2);
+            border-color: rgba(255, 255, 255, 0.4);
+        }
+
+        @keyframes gentleOrbit {
+            0%, 100% { 
+                transform: translateY(0) translateX(0); 
+            }
+            25% { 
+                transform: translateY(-20px) translateX(15px); 
+            }
+            50% { 
+                transform: translateY(15px) translateX(-20px); 
+            }
+            75% { 
+                transform: translateY(-15px) translateX(20px); 
+            }
+        }
+
+        /* Resume Droplet in Space */
+        .space-droplet {
+            position: absolute;
+            width: 70px;
+            height: 70px;
+            background: radial-gradient(circle at 30% 30%, 
+                rgba(100, 150, 255, 0.8) 0%, 
+                rgba(50, 100, 200, 0.6) 40%, 
+                rgba(20, 50, 150, 0.4) 100%);
+            border-radius: 50%;
+            cursor: pointer;
+            animation: pulseFloat 6s infinite ease-in-out;
+            box-shadow: 0 0 30px rgba(100, 150, 255, 0.5),
+                        inset -5px -5px 15px rgba(255, 255, 255, 0.2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 11px;
+            color: white;
+            font-weight: bold;
+            text-align: center;
+            transition: all 0.3s ease;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            z-index: 600;
+            opacity: 0;
+        }
+
+        .space-droplet.visible {
+            opacity: 1;
+            transition: opacity 1s ease-in-out 0.5s;
+        }
+
+        .space-droplet:hover {
+            transform: scale(1.2) rotate(360deg);
+            box-shadow: 0 0 40px rgba(150, 200, 255, 0.8),
+                        inset -5px -5px 15px rgba(255, 255, 255, 0.4);
+        }
+
+        @keyframes pulseFloat {
+            0%, 100% { 
+                transform: translateY(0) scale(1); 
+            }
+            25% { 
+                transform: translateY(-15px) scale(1.05); 
+            }
+            50% { 
+                transform: translateY(10px) scale(0.95); 
+            }
+            75% { 
+                transform: translateY(-10px) scale(1.02); 
+            }
+        }
+
+        /* Center title in space */
+        .space-title {
+            position: absolute;
+            top: 10%;
+            left: 50%;
+            transform: translateX(-50%);
+            text-align: center;
+            opacity: 0;
+            z-index: 600;
+        }
+
+        .space-title.visible {
+            opacity: 1;
+            transition: opacity 2s ease-in-out;
+        }
+
+        .space-title h1 {
+            font-size: 3rem;
+            font-weight: 200;
+            letter-spacing: 0.3rem;
+            margin-bottom: 0.5rem;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .space-title p {
+            font-size: 1rem;
+            color: rgba(255, 255, 255, 0.7);
+            letter-spacing: 0.1rem;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .space-link {
+                font-size: 12px;
+                padding: 10px 20px;
+            }
+            
+            .space-title h1 {
+                font-size: 2rem;
+            }
+
+            .space-droplet {
+                width: 60px;
+                height: 60px;
+                font-size: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Typing Animation Container -->
+    <div class="typing-container" id="typingContainer">
+        <div class="messages" id="messages"></div>
+    </div>
+
+    <!-- Space Scene -->
+    <div class="space-scene" id="spaceScene">
+        <!-- Title -->
+        <div class="space-title" id="spaceTitle">
+            <h1>JAY HILL</h1>
+            <p>Designer & Developer</p>
+        </div>
+
+        <!-- Floating Links -->
+        <a href="https://github.com/jayhill365" class="space-link" target="_blank" style="top: 30%; left: 10%; animation-delay: 0s;">OLDGitHub</a>
+        <a href="https://twitter.com/_jayhill" class="space-link" target="_blank" style="top: 50%; right: 12%; animation-delay: 0.5s;">X</a>
+        <a href="https://linkedin.com/in/ja-hill" class="space-link" target="_blank" style="top: 70%; left: 15%; animation-delay: 1s;">LinkedIn</a>
+        <a href="https://LegacyInTheSkies.co" class="space-link" target="_blank" style="top: 35%; left: 45%; animation-delay: 1.5s;">LegacyInTheSkies ✈️</a>
+        <a href="https://www.instagram.com/1jayhill/" class="space-link" target="_blank" style="top: 60%; right: 30%; animation-delay: 2s;">Instagram</a>
+        <a href="https://www.instagram.com/jayhillproduction/" class="space-link" target="_blank" style="top: 45%; right: 8%; animation-delay: 2.5s;">Photography</a>
+        <a href="https://1jayhill.medium.com" class="space-link" target="_blank" style="top: 75%; left: 40%; animation-delay: 3s;">Medium</a>
+        <a href="mailto:jay@legacyintheskies.co" class="space-link" style="top: 25%; right: 25%; animation-delay: 3.5s;">Email 📧</a>
+
+        <!-- Resume Droplet -->
+        <div class="space-droplet" style="top: 50%; left: 70%;" onclick="downloadResume()">
+            📄<br>Resume
+        </div>
+    </div>
+
+    <script>
+        // Typing animation messages
+        const messages = [
+            { text: '💻🌃', delay: 500 },
+            { text: "I'm Jay Hill 🧿", delay: 1000 },
+            { text: 'I Design & Code 💻', delay: 1000 },
+            { text: 'Creator of LegacyInTheSkies.co ✈', delay: 1200 },
+            { text: 'Building digital experiences', delay: 1000 },
+            { text: 'Let\'s create something amazing', delay: 1200 }
+        ];
+
+        let messageIndex = 0;
+        const messagesContainer = document.getElementById('messages');
+        const typingContainer = document.getElementById('typingContainer');
+        const spaceScene = document.getElementById('spaceScene');
+        const spaceTitle = document.getElementById('spaceTitle');
+
+        // Create typing animation
+        function showMessage() {
+            if (messageIndex < messages.length) {
+                const bubble = document.createElement('div');
+                bubble.className = 'bubble';
+                bubble.style.animationDelay = messageIndex * 0.2 + 's';
+                bubble.innerHTML = messages[messageIndex].text;
+                messagesContainer.appendChild(bubble);
+                
+                messageIndex++;
+                setTimeout(showMessage, messages[messageIndex - 1].delay);
+            } else {
+                // Start transition to space scene
+                setTimeout(transitionToSpace, 2000);
+            }
+        }
+
+        // Transition to space scene
+        function transitionToSpace() {
+            typingContainer.style.opacity = '0';
+            setTimeout(() => {
+                typingContainer.style.display = 'none';
+                spaceScene.classList.add('active');
+                createStars();
+                createParticles();
+                
+                // Show title and links
+                setTimeout(() => {
+                    spaceTitle.classList.add('visible');
+                    const links = document.querySelectorAll('.space-link');
+                    links.forEach((link, index) => {
+                        setTimeout(() => {
+                            link.classList.add('visible');
+                        }, index * 200);
+                    });
+                    document.querySelector('.space-droplet').classList.add('visible');
+                }, 500);
+
+                // Start shooting stars
+                setInterval(createShootingStar, 4000);
+            }, 1000);
+        }
+
+        // Create stars for space scene
+        function createStars() {
+            for (let i = 0; i < 150; i++) {
+                const star = document.createElement('div');
+                star.className = 'star';
+                const size = Math.random() * 3 + 0.5;
+                star.style.width = size + 'px';
+                star.style.height = size + 'px';
+                star.style.left = Math.random() * 100 + '%';
+                star.style.top = Math.random() * 100 + '%';
+                star.style.animationDelay = Math.random() * 3 + 's';
+                star.style.animationDuration = (2 + Math.random() * 2) + 's';
+                spaceScene.appendChild(star);
+            }
+        }
+
+        // Create floating particles
+        function createParticles() {
+            for (let i = 0; i < 40; i++) {
+                const particle = document.createElement('div');
+                particle.className = 'particle';
+                particle.style.left = Math.random() * 100 + '%';
+                particle.style.animationDelay = Math.random() * 25 + 's';
+                particle.style.animationDuration = (20 + Math.random() * 15) + 's';
+                particle.style.opacity = Math.random() * 0.5 + 0.3;
+                spaceScene.appendChild(particle);
+            }
+        }
+
+        // Create shooting stars
+        function createShootingStar() {
+            const shootingStar = document.createElement('div');
+            shootingStar.className = 'shooting-star';
+            
+            // Random starting position from top or right edge
+            const startFromTop = Math.random() > 0.5;
+            if (startFromTop) {
+                shootingStar.style.top = Math.random() * 30 + '%';
+                shootingStar.style.right = '-10px';
+            } else {
+                shootingStar.style.top = '-10px';
+                shootingStar.style.right = Math.random() * 50 + '%';
+            }
+            
+            spaceScene.appendChild(shootingStar);
+            
+            // Remove after animation completes
+            setTimeout(() => {
+                shootingStar.remove();
+            }, 2500);
+        }
+
+        // Download resume function
+        function downloadResume() {
+            // Create a temporary link element
+            const link = document.createElement('a');
+            link.href = 'resume.pdf'; // You'll need to add your actual resume file
+            link.download = 'JayHill_Resume.pdf';
+            link.click();
+            
+            // Visual feedback
+            event.target.style.transform = 'scale(1.3) rotate(360deg)';
+            setTimeout(() => {
+                event.target.style.transform = '';
+            }, 500);
+        }
+
+        // Start the animation sequence
+        setTimeout(showMessage, 500);
+
+        // Add parallax effect on mouse movement
+        document.addEventListener('mousemove', (e) => {
+            if (spaceScene.classList.contains('active')) {
+                const x = (e.clientX / window.innerWidth - 0.5) * 2;
+                const y = (e.clientY / window.innerHeight - 0.5) * 2;
+                
+                const stars = document.querySelectorAll('.star');
+                stars.forEach((star, index) => {
+                    const speed = (index % 3 + 1) * 0.5;
+                    star.style.transform = `translate(${x * speed}px, ${y * speed}px)`;
+                });
+            }
+        });
+    </script>
+</body>
+</html>
