@@ -124,52 +124,16 @@
         }
 
         /* Shooting Stars */
-        /* Shooting Stars - Improved */
+        /* Render shooting stars as small specs without long tails */
 .shooting-star {
     position: absolute;
-    width: 4px;
-    height: 4px;
+    width: 3px;
+    height: 3px;
     background: white;
     border-radius: 50%;
     filter: drop-shadow(0 0 6px rgba(255, 255, 255, 1));
     animation: shoot 2s linear infinite;
     opacity: 0;
-}
-
-.shooting-star::before {
-    content: '';
-    position: absolute;
-    top: 50%;
-    transform: translateY(-50%);
-    width: 300px;
-    height: 2px;
-    background: linear-gradient(90deg, 
-        transparent,
-        rgba(255, 255, 255, 0.1) 10%,
-        rgba(255, 255, 255, 0.4) 20%,
-        rgba(255, 255, 255, 0.6) 30%,
-        rgba(255, 255, 255, 0.8) 50%,
-        white 100%
-    );
-    right: -2px;
-    transform-origin: right center;
-}
-
-.shooting-star::after {
-    content: '';
-    position: absolute;
-    top: 50%;
-    transform: translateY(-50%);
-    width: 150px;
-    height: 1px;
-    background: linear-gradient(90deg,
-        transparent,
-        rgba(100, 150, 255, 0.2) 20%,
-        rgba(100, 150, 255, 0.5) 60%,
-        rgba(150, 200, 255, 0.8) 100%
-    );
-    right: -2px;
-    filter: blur(2px);
 }
 
 @keyframes shoot {
@@ -189,65 +153,6 @@
     }
 }
 
-/* Alternative shooting star style - more comet-like */
-.shooting-star-alt {
-    position: absolute;
-    width: 0;
-    height: 0;
-    opacity: 0;
-    animation: shootAlt 3s linear infinite;
-}
-
-.shooting-star-alt::before {
-    content: '';
-    position: absolute;
-    width: 5px;
-    height: 5px;
-    background: radial-gradient(circle, white 0%, rgba(255, 255, 255, 0.8) 40%, transparent 100%);
-    border-radius: 50%;
-    box-shadow: 
-        0 0 10px rgba(255, 255, 255, 1),
-        0 0 20px rgba(100, 150, 255, 0.8),
-        0 0 30px rgba(100, 150, 255, 0.6);
-}
-
-.shooting-star-alt::after {
-    content: '';
-    position: absolute;
-    top: 2px;
-    left: 4px;
-    width: 100px;
-    height: 1px;
-    background: linear-gradient(90deg,
-        white,
-        rgba(255, 255, 255, 0.8) 10%,
-        rgba(100, 150, 255, 0.5) 40%,
-        rgba(100, 150, 255, 0.2) 60%,
-        transparent 100%
-    );
-    transform: rotate(45deg);
-    transform-origin: left center;
-    filter: blur(1px);
-}
-
-@keyframes shootAlt {
-    0% {
-        opacity: 0;
-        transform: translateX(200px) translateY(-200px) scale(0);
-    }
-    10% {
-        opacity: 1;
-        transform: translateX(150px) translateY(-150px) scale(1);
-    }
-    90% {
-        opacity: 1;
-        transform: translateX(-900px) translateY(500px) scale(1);
-    }
-    100% {
-        opacity: 0;
-        transform: translateX(-950px) translateY(550px) scale(0);
-    }
-}
 
         /* Floating Links in Space */
         .space-link {
@@ -518,13 +423,10 @@
             }
         }
 
-       // Updated createShootingStar function with alternating styles
+       // Create a shooting star rendered as a small spec
 function createShootingStar() {
     const shootingStar = document.createElement('div');
-    
-    // Randomly choose between two shooting star styles
-    const useAltStyle = Math.random() > 0.5;
-    shootingStar.className = useAltStyle ? 'shooting-star-alt' : 'shooting-star';
+    shootingStar.className = 'shooting-star';
     
     // Random starting position
     const startFromTop = Math.random() > 0.5;
@@ -539,9 +441,9 @@ function createShootingStar() {
     // Vary animation duration for more natural effect
     const duration = 2 + Math.random() * 2;
     shootingStar.style.animationDuration = duration + 's';
-    
+
     spaceScene.appendChild(shootingStar);
-    
+
     // Remove after animation completes
     setTimeout(() => {
         shootingStar.remove();
