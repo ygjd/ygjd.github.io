@@ -68,6 +68,22 @@
             }
         }
 
+        /* Matrix Overlay */
+        .matrix-overlay {
+            position: fixed;
+            inset: 0;
+            background: #000;
+            z-index: 900;
+            opacity: 0;
+            display: none;
+            transition: opacity 0.8s ease;
+        }
+        .matrix-overlay canvas {
+            width: 100%;
+            height: 100%;
+            display: block;
+        }
+
         /* Space Scene */
         .space-scene {
             position: fixed;
@@ -124,35 +140,33 @@
         }
 
         /* Shooting Stars */
-        /* Render shooting stars as small specs without long tails */
-.shooting-star {
-    position: absolute;
-    width: 3px;
-    height: 3px;
-    background: white;
-    border-radius: 50%;
-    filter: drop-shadow(0 0 6px rgba(255, 255, 255, 1));
-    animation: shoot 2s linear infinite;
-    opacity: 0;
-}
+        .shooting-star {
+            position: absolute;
+            width: 3px;
+            height: 3px;
+            background: white;
+            border-radius: 50%;
+            filter: drop-shadow(0 0 6px rgba(255, 255, 255, 1));
+            animation: shoot 2s linear infinite;
+            opacity: 0;
+        }
 
-@keyframes shoot {
-    0% {
-        opacity: 0;
-        transform: translateX(300px) translateY(-300px) rotate(45deg);
-    }
-    5% {
-        opacity: 1;
-    }
-    95% {
-        opacity: 1;
-    }
-    100% {
-        opacity: 0;
-        transform: translateX(-1200px) translateY(600px) rotate(45deg);
-    }
-}
-
+        @keyframes shoot {
+            0% {
+                opacity: 0;
+                transform: translateX(300px) translateY(-300px) rotate(45deg);
+            }
+            5% {
+                opacity: 1;
+            }
+            95% {
+                opacity: 1;
+            }
+            100% {
+                opacity: 0;
+                transform: translateX(-1200px) translateY(600px) rotate(45deg);
+            }
+        }
 
         /* Floating Links in Space */
         .space-link {
@@ -215,7 +229,6 @@
             z-index: 700;
         }
 
-
         /* Resume Droplet in Space */
         .space-droplet {
             width: 70px;
@@ -252,7 +265,6 @@
             box-shadow: 0 0 40px rgba(150, 200, 255, 0.8),
                         inset -5px -5px 15px rgba(255, 255, 255, 0.4);
         }
-
 
         /* Center title in space */
         .space-title {
@@ -312,6 +324,11 @@
         <div class="messages" id="messages"></div>
     </div>
 
+    <!-- Matrix Overlay -->
+    <div class="matrix-overlay" id="matrixOverlay">
+        <canvas id="matrixCanvas"></canvas>
+    </div>
+
     <!-- Space Scene -->
     <div class="space-scene" id="spaceScene">
         <!-- Title -->
@@ -344,7 +361,7 @@
             { text: 'I design & code ', delay: 1000 },
             { text: 'Creator of LegacyInTheSkies.co ✈', delay: 1200 },
             { text: 'Continuously building', delay: 1000 },
-            { text: 'Let\'s create', delay: 1200 }
+            { text: 'Let\\'s create', delay: 1200 }
         ];
 
         let messageIndex = 0;
@@ -352,6 +369,12 @@
         const typingContainer = document.getElementById('typingContainer');
         const spaceScene = document.getElementById('spaceScene');
         const spaceTitle = document.getElementById('spaceTitle');
+
+        // Matrix elements
+        const matrixOverlay = document.getElementById('matrixOverlay');
+        const matrixCanvas = document.getElementById('matrixCanvas');
+        let matrixAnimationId = null;
+        let matrixRunning = false;
 
         // Create typing animation
         function showMessage() {
@@ -365,36 +388,118 @@
                 messageIndex++;
                 setTimeout(showMessage, messages[messageIndex - 1].delay);
             } else {
-                // Start transition to space scene
+                // Start transition to matrix, then space scene
                 setTimeout(transitionToSpace, 2000);
             }
         }
 
-        // Transition to space scene
+        // Transition: hide typing -> show matrix -> reveal space
         function transitionToSpace() {
             typingContainer.style.opacity = '0';
             setTimeout(() => {
                 typingContainer.style.display = 'none';
-                spaceScene.classList.add('active');
-                createStars();
-                createParticles();
-                
-                // Show title and links
-                setTimeout(() => {
-                    spaceTitle.classList.add('visible');
-                    const links = document.querySelectorAll('.space-link');
-                    links.forEach((link, index) => {
-                        setTimeout(() => {
-                            link.classList.add('visible');
-                        }, index * 200);
-                    });
-                    document.querySelector('.space-droplet').classList.add('visible');
-                }, 500);
+                startMatrix(2500); // duration in ms
+            }, 1000);
+        }
 
-                  // Start shooting stars at a slower pace
-                  setInterval(createShootingStar, 10000);
-              }, 1000);
-          }
+        // Activate space scene (unchanged behavior moved here)
+        function proceedToSpace() {
+            spaceScene.classList.add('active');
+            createStars();
+            createParticles();
+            
+            // Show title and links
+            setTimeout(() => {
+                spaceTitle.classList.add('visible');
+                const links = document.querySelectorAll('.space-link');
+                links.forEach((link, index) => {
+                    setTimeout(() => {
+                        link.classList.add('visible');
+                    }, index * 200);
+                });
+                document.querySelector('.space-droplet').classList.add('visible');
+            }, 500);
+
+            // Start shooting stars at a slower pace
+            setInterval(createShootingStar, 10000);
+        }
+
+        // Start Matrix overlay
+        function startMatrix(durationMs = 2500) {
+            // Prepare overlay
+            matrixOverlay.style.display = 'block';
+            // Force reflow before changing opacity
+            void matrixOverlay.offsetWidth;
+            matrixOverlay.style.opacity = '1';
+
+            matrixRunning = true;
+            runMatrix();
+
+            // Stop and fade out after duration
+            setTimeout(() => {
+                matrixOverlay.style.opacity = '0';
+                matrixRunning = false;
+                setTimeout(() => {
+                    matrixOverlay.style.display = 'none';
+                    proceedToSpace();
+                }, 800); // match CSS transition
+            }, durationMs);
+        }
+
+        // Matrix animation loop
+        function runMatrix() {
+            const ctx = matrixCanvas.getContext('2d');
+            const fontSize = 16;
+            const charset = 'アカサタナハマヤラワ0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
+
+            function resize() {
+                matrixCanvas.width = window.innerWidth;
+                matrixCanvas.height = window.innerHeight;
+                columns = Math.floor(matrixCanvas.width / fontSize);
+                drops = new Array(columns).fill(1 + Math.floor(Math.random() * 20));
+            }
+
+            let columns = 0;
+            let drops = [];
+            resize();
+
+            window.addEventListener('resize', resize);
+
+            function draw() {
+                if (!matrixRunning) {
+                    cancelAnimationFrame(matrixAnimationId);
+                    window.removeEventListener('resize', resize);
+                    return;
+                }
+
+                // Slightly opaque rect for trailing effect
+                ctx.fillStyle = 'rgba(0, 0, 0, 0.08)';
+                ctx.fillRect(0, 0, matrixCanvas.width, matrixCanvas.height);
+
+                ctx.fillStyle = '#0f0';
+                ctx.font = fontSize + 'px monospace';
+
+                for (let i = 0; i < drops.length; i++) {
+                    const text = charset.charAt(Math.floor(Math.random() * charset.length));
+                    const x = i * fontSize;
+                    const y = drops[i] * fontSize;
+                    ctx.fillText(text, x, y);
+
+                    if (y > matrixCanvas.height && Math.random() > 0.975) {
+                        drops[i] = 0;
+                    }
+                    drops[i]++;
+                }
+
+                matrixAnimationId = requestAnimationFrame(draw);
+            }
+
+            // Prime background
+            ctx.fillStyle = 'rgba(0, 0, 0, 1)';
+            ctx.fillRect(0, 0, matrixCanvas.width, matrixCanvas.height);
+
+            draw();
+        }
 
         // Create stars for space scene
         function createStars() {
@@ -425,38 +530,37 @@
             }
         }
 
-       // Create a shooting star rendered as a small spec
-function createShootingStar() {
-    const shootingStar = document.createElement('div');
-    shootingStar.className = 'shooting-star';
-    
-    // Random starting position
-    const startFromTop = Math.random() > 0.5;
-    if (startFromTop) {
-        shootingStar.style.top = Math.random() * 40 + '%';
-        shootingStar.style.right = Math.random() * 30 - 50 + 'px';
-    } else {
-        shootingStar.style.top = Math.random() * 20 - 50 + 'px';
-        shootingStar.style.right = Math.random() * 60 + '%';
-    }
-    
-    // Vary animation duration for more natural effect
-    const duration = 2 + Math.random() * 2;
-    shootingStar.style.animationDuration = duration + 's';
+        // Create a shooting star rendered as a small spec
+        function createShootingStar() {
+            const shootingStar = document.createElement('div');
+            shootingStar.className = 'shooting-star';
+            
+            // Random starting position
+            const startFromTop = Math.random() > 0.5;
+            if (startFromTop) {
+                shootingStar.style.top = Math.random() * 40 + '%';
+                shootingStar.style.right = Math.random() * 30 - 50 + 'px';
+            } else {
+                shootingStar.style.top = Math.random() * 20 - 50 + 'px';
+                shootingStar.style.right = Math.random() * 60 + '%';
+            }
+            
+            // Vary animation duration for more natural effect
+            const duration = 2 + Math.random() * 2;
+            shootingStar.style.animationDuration = duration + 's';
 
-    spaceScene.appendChild(shootingStar);
+            spaceScene.appendChild(shootingStar);
 
-    // Remove after animation completes
-    setTimeout(() => {
-        shootingStar.remove();
-    }, duration * 1000);
-}
+            // Remove after animation completes
+            setTimeout(() => {
+                shootingStar.remove();
+            }, duration * 1000);
+        }
 
-          // Download resume function
-          function downloadResume() {
-            // Create a temporary link element
+        // Download resume function
+        function downloadResume() {
             const link = document.createElement('a');
-              link.href = 'Resume.pdf'; // You'll need to add your actual resume file
+            link.href = 'Resume.pdf'; // You'll need to add your actual resume file
             link.download = 'JayHill_Resume.pdf';
             link.click();
             
